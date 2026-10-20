@@ -1,0 +1,1 @@
+# Uses Python standard library and SpectrumSnek's shared sdr_manager.py.
