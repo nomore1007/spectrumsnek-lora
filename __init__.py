@@ -10,7 +10,7 @@ import sys
 import tempfile
 import time
 import traceback
-from datetime import datetime
+from datetime import datetime, timezone
 
 try:
     from sdr_manager import SDRManager
@@ -131,7 +131,7 @@ def run():
             powers = sorted(power for _, power in samples)
             noise = powers[len(powers) // 2]
             events = [(freq, power) for freq, power in samples if power >= noise + threshold]
-            stamp = datetime.now().astimezone().isoformat(timespec="seconds")
+            stamp = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
             rows = [(stamp, int(freq), round(power, 2), round(noise, 2), threshold)
                     for freq, power in events]
             _append_events(rows)
