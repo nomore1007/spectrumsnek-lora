@@ -1,0 +1,37 @@
+name: LoRa plugin tests
+
+on:
+  push:
+    branches: ["main", "feature/**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Run plugin unit tests
+        run: python -m unittest discover -s tests -v
+
+  upstream-decoder-tests:
+    runs-on: ubuntu-latest
+    env:
+      LORA_RX_REV: beb7bad8554dc78133c90e83d594c2b49d00d1ea
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install decoder build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git build-essential librtlsdr-dev
+      - name: Fetch pinned upstream decoder
+        run: |
+          git clone --no-checkout https://github.com/mmmaly/LoraReceiverStandalone.git vendor/LoraReceiverStandalone
+          git -C vendor/LoraReceiverStandalone fetch --depth 1 origin "$LORA_RX_REV"
+          git -C vendor/LoraReceiverStandalone checkout --detach "$LORA_RX_REV"
+      - name: Build and run upstream offline test suite
+        run: make -C vendor/LoraReceiverStandalone check
