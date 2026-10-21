@@ -26,5 +26,17 @@ class RtlPowerParserTests(unittest.TestCase):
         self.assertEqual([power for _, power in samples], [-40.0, -45.0])
 
 
+class FrequencyParserTests(unittest.TestCase):
+    def test_frequency_suffixes(self):
+        self.assertEqual(MODULE._frequency_hz("902M"), 902_000_000)
+        self.assertEqual(MODULE._frequency_hz("125k"), 125_000)
+        self.assertEqual(MODULE._frequency_hz("915000000"), 915_000_000)
+        self.assertEqual(MODULE._frequency_hz("0.9G"), 900_000_000)
+
+    def test_invalid_frequency_raises(self):
+        with self.assertRaises(ValueError):
+            MODULE._frequency_hz("not-a-frequency")
+
+
 if __name__ == "__main__":
     unittest.main()
